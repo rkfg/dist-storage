@@ -22,7 +22,7 @@ public class PlainContentWriter implements RaindropContentWriter {
                     + dataIndex);
         }
         if (fileLength > 0) {
-            if (fileLength < block.length) {
+            if (fileLength <= block.length) {
                 len = (int) fileLength;
             }
             stream.write(block, 0, len);

@@ -58,7 +58,7 @@ public class Condenser {
             for (RainHash rainHash : rainFile.getHashList()) {
                 if (skip == 0) {
                     RainDrop rainDrop = storage.retrieveRaindrop(rainHash);
-                    if (random.nextInt(100) < 99) {
+                    if (random.nextInt(100) < 95) {
                         if (writer.writeBlock(rainDrop.getContent(), dataIndex++)) {
                             skip = FEC.n - dataIndex;
                             dataIndex = 0;
