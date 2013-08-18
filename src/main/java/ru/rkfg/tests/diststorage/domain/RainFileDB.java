@@ -20,17 +20,21 @@ public class RainFileDB {
     byte[] hashes;
     byte[] selfHash;
     long fileLength;
+    int k;
+    int n;
 
     public RainFileDB() {
     }
 
-    public RainFileDB(String name, Boolean fec, byte[] hashes, byte[] selfHash, long fileLength) {
+    public RainFileDB(String name, Boolean fec, byte[] hashes, byte[] selfHash, long fileLength, int k, int n) {
         super();
         this.name = name;
         this.hashes = hashes;
         this.selfHash = selfHash;
         this.fec = fec;
         this.fileLength = fileLength;
+        this.k = k;
+        this.n = n;
     }
 
     public Long getId() {
@@ -79,6 +83,22 @@ public class RainFileDB {
 
     public void setFileLength(long fileLength) {
         this.fileLength = fileLength;
+    }
+
+    public int getK() {
+        return k;
+    }
+
+    public void setK(int k) {
+        this.k = k;
+    }
+
+    public int getN() {
+        return n;
+    }
+
+    public void setN(int n) {
+        this.n = n;
     }
 
 }

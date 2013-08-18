@@ -15,6 +15,8 @@ public class Main {
 
     static int i = 0;
     static long[] profile = new long[100];
+    static int k = 100;
+    static int n = 120;
 
     /**
      * @param args
@@ -42,7 +44,7 @@ public class Main {
                 String path = ServerUtils.expandHome(filename);
                 File file = new File(path);
                 if (!file.isDirectory() && file.exists()) {
-                    sprinkler = new Sprinkler(path, storage, file.length() > RainDrop.RAINSIZE * FEC.k);
+                    sprinkler = new Sprinkler(path, storage, file.length() > RainDrop.getBestDropSize(file.length()) * k, k, n);
                     RainFile rainFile = sprinkler.storeFile();
                     System.out.println(rainFile);
                 }

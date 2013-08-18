@@ -21,6 +21,7 @@ public class Condenser {
     private Storage storage;
     private RaindropContentWriter writer;
     private Random random = new Random();
+    private int n;
 
     public Condenser(final RainHash hash, Storage storage, final String filename) throws LogicException, ClientAuthenticationException {
         this.storage = storage;
@@ -31,11 +32,15 @@ public class Condenser {
                 try {
                     RainFileDB rainFileDB = (RainFileDB) session.createQuery("from RainFileDB where selfHash = :sh")
                             .setBinary("sh", hash.getBytes()).uniqueResult();
+                    if (rainFileDB == null) {
+                        throw new ExtractionError("RainFile not found: " + hash.getBase64());
+                    }
                     rainFile = new RainFile(rainFileDB);
+                    Condenser.this.n = rainFile.getN();
                     ServerUtils.createFileDirs(ServerUtils.expandHome(filename));
                     FileOutputStream stream = new FileOutputStream(filename);
                     if (rainFile.getFec() != null && rainFile.getFec()) {
-                        writer = new FECContentWriter(stream, rainFile.getFileLength());
+                        writer = new FECContentWriter(stream, rainFile);
                     } else {
                         writer = new PlainContentWriter(stream, rainFile.getFileLength());
                     }
@@ -60,7 +65,7 @@ public class Condenser {
                     RainDrop rainDrop = storage.retrieveRaindrop(rainHash);
                     if (random.nextInt(100) < 95) {
                         if (writer.writeBlock(rainDrop.getContent(), dataIndex++)) {
-                            skip = FEC.n - dataIndex;
+                            skip = n - dataIndex;
                             dataIndex = 0;
                             System.out.println("--- segment ---");
                         }

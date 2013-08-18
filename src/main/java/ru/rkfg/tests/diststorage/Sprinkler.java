@@ -18,18 +18,24 @@ public class Sprinkler {
     private Storage storage;
     RaindropContentReader reader;
     private long fileLength;
+    private int dropSize;
+    private int k;
+    private int n;
 
-    public Sprinkler(String filename, Storage storage, boolean doFEC) throws LogicException, IOException {
+    public Sprinkler(String filename, Storage storage, boolean doFEC, int k, int n) throws LogicException, IOException {
         File file = new File(filename);
         stream = new FileInputStream(file);
         fileLength = file.length();
+        dropSize = RainDrop.getBestDropSize(fileLength);
         this.filename = file.getName();
         this.doFEC = doFEC;
         this.storage = storage;
+        this.k = k;
+        this.n = n;
         if (doFEC) {
-            reader = new FECContentReader(stream);
+            reader = new FECContentReader(stream, fileLength, k, n);
         } else {
-            reader = new PlainContentReader(stream);
+            reader = new PlainContentReader(stream, fileLength);
         }
     }
 
@@ -43,6 +49,14 @@ public class Sprinkler {
             }
         } catch (NoMoreRaindrops e) {
         }
-        return new RainFile(filename, doFEC, raindropHashes, fileLength);
+        return new RainFile(filename, doFEC, raindropHashes, fileLength, k, n);
+    }
+
+    public int getDropSize() {
+        return dropSize;
+    }
+
+    public void setDropSize(int dropSize) {
+        this.dropSize = dropSize;
     }
 }

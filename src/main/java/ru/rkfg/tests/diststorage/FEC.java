@@ -13,26 +13,32 @@ import com.onionnetworks.util.Buffer;
 public class FEC {
 
     private FECCode fecCode;
-    public static final int k = 100;
-    public static final int n = 120;
-    private byte[][] sourceData = new byte[k][RainDrop.RAINSIZE];
-    private byte[][] targetData = new byte[n][RainDrop.RAINSIZE];
-    private Buffer[] sourceBuffer = new Buffer[k];
-    private Buffer[] targetBuffer = new Buffer[n];
-    private int[] indexes = new int[n];
+    private int k;
+    private byte[][] sourceData;
+    private byte[][] targetData;
+    private Buffer[] sourceBuffer;
+    private Buffer[] targetBuffer;
+    private int[] indexes;
     private int index = 0;
     private InputStream inputStream;
     private OutputStream outputStream;
     int actualRead;
     private long fileLength;
-    private int len = RainDrop.RAINSIZE;
+    private int len;
 
-    protected FEC() {
+    private FEC(long fileLength, int k, int n) {
+        this.len = RainDrop.getBestDropSize(fileLength);
+        this.k = k;
         fecCode = FECCodeFactory.getDefault().createFECCode(k, n);
+        sourceData = new byte[k][len];
+        sourceBuffer = new Buffer[k];
+        targetData = new byte[n][len];
+        targetBuffer = new Buffer[n];
+        indexes = new int[n];
     }
 
-    public FEC(InputStream stream) {
-        this();
+    public FEC(InputStream stream, long fileLength, int k, int n) {
+        this(fileLength, k, n);
         this.inputStream = stream;
         for (int i = 0; i < sourceBuffer.length; i++) {
             sourceBuffer[i] = new Buffer(sourceData[i]);
@@ -43,10 +49,10 @@ public class FEC {
         }
     }
 
-    public FEC(FileOutputStream stream, long fileLength) {
-        this();
+    public FEC(FileOutputStream stream, RainFile rainFile) {
+        this(rainFile.getFileLength(), rainFile.getK(), rainFile.getN());
         outputStream = stream;
-        this.fileLength = fileLength;
+        this.fileLength = rainFile.getFileLength();
         for (int i = 0; i < targetBuffer.length; i++) {
             targetBuffer[i] = new Buffer(targetData[i]);
         }
@@ -72,7 +78,7 @@ public class FEC {
             }
             fecCode.encode(sourceBuffer, targetBuffer, indexes);
         }
-        return Arrays.copyOf(targetData[index++], RainDrop.RAINSIZE);
+        return Arrays.copyOf(targetData[index++], len);
     }
 
     public boolean writeBlockToStream(byte[] data, int dataIndex) throws IOException {

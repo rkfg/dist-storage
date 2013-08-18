@@ -24,14 +24,18 @@ public class RainFile {
     final List<RainHash> hashList;
     long fileLength;
     final boolean fec;
+    private int k;
+    private int n;
     RainHash selfHash = null;
 
-    public RainFile(final String filename, boolean fec, List<RainHash> hashList, final long fileLength) {
+    public RainFile(final String filename, boolean fec, List<RainHash> hashList, final long fileLength, final int k, final int n) {
         super();
         this.filename = filename;
         this.hashList = hashList;
         this.fec = fec;
         this.fileLength = fileLength;
+        this.k = k;
+        this.n = n;
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256", "BC");
             digest.update(filename.getBytes("utf-8"));
@@ -51,7 +55,8 @@ public class RainFile {
                         if (rainFileDB != null) {
                             session.delete(rainFileDB);
                         }
-                        rainFileDB = new RainFileDB(filename, RainFile.this.fec, hashConcat.toByteArray(), selfHash.getBytes(), fileLength);
+                        rainFileDB = new RainFileDB(filename, RainFile.this.fec, hashConcat.toByteArray(), selfHash.getBytes(), fileLength,
+                                k, n);
                         session.merge(rainFileDB);
                         return null;
                     } catch (NonUniqueResultException e) {
@@ -84,6 +89,8 @@ public class RainFile {
         selfHash = new RainHash(rainFileDB.getSelfHash());
         hashList = new LinkedList<RainHash>();
         fileLength = rainFileDB.getFileLength();
+        k = rainFileDB.getK();
+        n = rainFileDB.getN();
         fec = rainFileDB.getFec();
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(rainFileDB.getHashes());
         while (byteArrayInputStream.available() > 0) {
@@ -118,5 +125,13 @@ public class RainFile {
 
     public long getFileLength() {
         return fileLength;
+    }
+
+    public int getK() {
+        return k;
+    }
+
+    public int getN() {
+        return n;
     }
 }

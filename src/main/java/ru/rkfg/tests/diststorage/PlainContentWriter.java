@@ -7,12 +7,13 @@ public class PlainContentWriter implements RaindropContentWriter {
 
     private FileOutputStream stream;
     private long fileLength;
-    private int len = RainDrop.RAINSIZE;
+    private int len;
     private int dataIndex = 0;
 
     public PlainContentWriter(FileOutputStream stream, long fileLength) {
         this.stream = stream;
         this.fileLength = fileLength;
+        this.len = RainDrop.getBestDropSize(fileLength);
     }
 
     @Override

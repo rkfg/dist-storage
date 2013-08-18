@@ -8,7 +8,8 @@ public interface RaindropContentWriter {
      * 
      * @param block
      * @param dataIndex
-     * @return true if you should skip next (n-x) blocks where x is number of already written blocks in the segment of n blocks
+     * @return n if you should skip next (n-x) blocks where x is number of already written blocks in the segment of n blocks, 0 if you
+     *         should just proceed
      * @throws IOException
      * @throws ExtractionError
      */

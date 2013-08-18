@@ -8,11 +8,11 @@ public class PlainContentReader implements RaindropContentReader {
 
     InputStream stream;
     int actualRead;
-    int tailSize;
-    byte[] plainReadBuffer = new byte[RainDrop.RAINSIZE];
+    byte[] plainReadBuffer;
 
-    public PlainContentReader(InputStream stream) {
+    public PlainContentReader(InputStream stream, long fileLength) {
         this.stream = stream;
+        plainReadBuffer = new byte[RainDrop.getBestDropSize(fileLength)];
     }
 
     @Override
@@ -22,9 +22,6 @@ public class PlainContentReader implements RaindropContentReader {
         if (actualRead < 1) {
             stream.close();
             throw new NoMoreRaindrops();
-        }
-        if (actualRead < RainDrop.RAINSIZE) {
-            tailSize = actualRead;
         }
         return Arrays.copyOf(plainReadBuffer, actualRead);
     }
